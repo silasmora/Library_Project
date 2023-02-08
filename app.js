@@ -3,12 +3,18 @@ console.log("Hello World!\n==========\n");
 // PROJECT Section
 console.log("PROJECT:\n==========\n");
 
-const titleEl = document.getElementById("title")
-const authorEl = document.getElementById("author")
-const readEl = document.getElementById("read")
+const books = [
+  {
+    id: 1,
+    title: "Name of the Wind",
+    author: "Patrick Rothfuss",
+    read: true,
+  }
+]
+
 
 class Book {
-  constructor(title, author, read){
+  constructor(id, title, author, read){
     this.id = id
     this.title = title
     this.author = author
@@ -17,27 +23,78 @@ class Book {
 }
 
 class Library {
-  constructor(bookCount, books) {
-    this.bookCount = bookCount
+  constructor(books) {
+    this.nextId = books.length
     this.books = books
   }
-  markRead(checkbox, id) {
-    for (let i = 0; i < this.books.length; i++){
-      if (id === this.books.id) {
-        books.read = true
-        checkbox.checked = true
-        checkbox.disabled = true
-    }
-  }
-  }
-
-
+  
   addBook() {
+      console.log("addbook")
+    const title = document.getElementById("title")
+    const author = document.getElementById("author")
+    const read = document.getElementById("read")
+    
+    this.nextId++
+    const newBook = new Book(this.nextId, title.value, author.value, read.checked)
+    this.books.push(newBook)
 
-    const newBook = new Book(titleEl.value, authorEl.value, readEl.value)
-    this.book.push(newBook)
+    const tbody = document.querySelector("#tableBody")
+    
+    const newTr = document.createElement("tr")
+    newTr.classList.add(newBook.id)
 
-    const newTabler = document.createElement("tr")
+    newTr.addEventListener("dblclick", () => {
+      this.removeBook(newBook.id)
+    })
+    
+    const newTitle = document.createElement("td")
+    const newAuthor = document.createElement("td")
+    const newRead = document.createElement("td")
+
+    newTitle.textContent = title.value
+    newAuthor.textContent = author.value
+    const newCheckbox = document.createElement("input")
+    newCheckbox.classList.add(newBook.id)
+    newCheckbox.type = "checkbox"
+    newCheckbox.checked = read.checked
+    newCheckbox.disabled = read.checked
+    newCheckbox.addEventListener("click", (event) => {
+      this.markRead(event.target, newBook.id)
+    })
+    newRead.appendChild(newCheckbox)
+    
+    newTr.append(newTitle)
+    newTr.append(newAuthor) 
+    newTr.append(newRead)
+
+    tbody.appendChild(newTr)
+  }
+  
+  markRead(checkbox, id) {
+    this.books.forEach((book) => {
+      if (id === book.id) {
+        book.read = true
+        // checkbox.checked = true
+        checkbox.disabled = true
+      }
+    })
+  }
+
+  removeBook(bookId) {
+    this.books = this.books.filter(({ id }) => bookId !== id)
+
+    const tbody = document.querySelector("#tableBody")
+    
+    tbody.removeChild(document.getElementsByClassName(bookId)[0])
   }
 
 }
+
+const library = new Library(books)
+
+const form = document.getElementById("form")
+
+form.addEventListener("submit", (event) => {
+  event.preventDefault()
+  library.addBook()
+})
